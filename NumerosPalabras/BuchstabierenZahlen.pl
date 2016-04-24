@@ -60,7 +60,7 @@ my ($program)=$0; $program=~s/^.*\/([^\/]+)$/$1/;
 my $optctl = {
 	'sep' => '' 
 	,'test' => '' 
-	,'digits' => 4 
+	,'digits' => 3 
 };
 
 Getopt::Long::GetOptions($optctl,
@@ -202,13 +202,14 @@ open AF, ">:utf8", $sAFile
 print AF "### Nummern -- Respuestas ($sTimestamp)\n\n";
 
 
-my $nSets=11;
+my $nSets=12;
 
-my $nSetSize=4;
+my $nSetSize=6;
 my $nLimit=10**$nDigits;
 &{$::debug}("nDigits:[$nDigits] nLimit:[$nLimit]");
 
 if ($optctl->{'test'}) {
+	Test_Num2De();
 	Test_GenNumSeq();
 } else {
 
@@ -221,19 +222,18 @@ for (my $nSet=1; $nSet < $nSets; $nSet+=1)
 	print QF "\n\n### Set $nSet\n\n";
 	print AF "\n\n### Set $nSet\n\n";
 
-	for( my $i=0; $i < $nSetSize; $i+=1)
-	{
-		my $n;
-		do { 
-			$n = int(rand($nLimit));
-		} while ($n < 10);
+	my @aSeq= GenNumSeq($nDigits, $nSetSize);
+	&{$::debug}("aSeq:[%s]", Dumper(\@aSeq));
 
+	for(my $i=0; $i < scalar(@aSeq); $i+=1) {
+		my $n=0+$aSeq[$i];
 		my @aPair=($n, Num2De($n));
 		push @aNumbers, \@aPair;
 		$rToWrite->{$i}=$n;
 
-		print AF sprintf("- %9d *----------> %s\n\n",@aPair);
-
+		print AF sprintf("- %60s *-----> %*d\n\n"
+			,$aPair[1], , $nDigits, $aPair[0]);
+		# print AF sprintf("- %9d *----------> %s\n\n",@aPair);
 	}
 	&{$::debug}("aNumbers:[%s]", Dumper(\@aNumbers));
 	&{$::debug}("rToWrite:[%s]", Dumper($rToWrite));
@@ -260,10 +260,12 @@ for (my $nSet=1; $nSet < $nSets; $nSet+=1)
 		my $words=$aNumbers[$j]->[1];
 
 		&{$::debug}("j:[$j] that:[%s] words:[%s]"
-			,$that, $words);
+			,$words, $that);
 
-		print QF sprintf("- %9d *          > %s\n\n"
-			,$this, $words);
+		print QF sprintf("- %60s *     > %*d\n\n"
+			,$words, $nDigits, $this);
+		# print QF sprintf("- %9d *          > %s\n\n"
+		# 	,$this, $words);
 
 	}
 }
@@ -333,7 +335,7 @@ sub GenNumSeq($$)
 
 	# Cuerpo de Funcion
 	my $nLimit=10**$nNumLen;
-	my $sNumber = '' . int(rand($nLimit));
+	my $sNumber = sprintf("%0*d", $nNumLen, int(rand($nLimit)));
 	&{$::debug}("sNumber:[%s]", $sNumber);
 	
 	my $rhNum={ $sNumber => 1};
@@ -372,7 +374,7 @@ sub Test_Num2De()
 	#@aNums= (101,21);
 	# @aNums= (1000,2001,2023,3034,4045,5056,6767,7878,8989,9090);
 	@aNums= (0,1,2,10,11,19,20
-		,21,99,100,101,345,603,840,999
+		,21,99,100,101,345,421,603,840,999
 		,1000,1001,2007,3010,9999,10000,10001,10010,10100,11000
 		,99999, 100000, 100001
 		,123456, 1234567, 2345678, 999999999
@@ -421,7 +423,7 @@ sub Num2De($)
 	} elsif( $num < 100 ) {
 		my $nRes=$num%10;
 		my $nTens=($num-$nRes)/10;
-		$ret = (($nRes == 1)? 'ein' : $cipher{$nRes}
+		$ret = ((($nRes == 1)? 'ein' : $cipher{$nRes})
 				.${sep}."und".${sep} )
 			if ($nRes>0);
 		$ret.= $hTens{$nTens};

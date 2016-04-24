@@ -3,14 +3,15 @@
 #
 
 
-SOURCE_FILES=Makefile num1.pl
+SOURCE_FILES=Makefile BuchstabierenZahlen.pl
+X_FILES=xnum1.pl
 	
 PERL_EXE=/usr/bin/perl
 
 .PHONY: all clean bkp chk file
 
 
-all: hello
+all: Nummen
 
 hello :
 	echo "Hello!."
@@ -21,17 +22,30 @@ clean:
 		
 bkp : 
 	bak.pl $(SOURCE_FILES)
+	bak.pl $(X_FILES)
 	
 chk:
 	clear
 	$(PERL_EXE) -c xnum1.pl
+	$(PERL_EXE) -c BuchstabierenZahlen.pl
 
 file : 
 	file *.csv *.trc *.pl
-	
-x : 
+
+Nummen : 
 	bak.pl Nummern-*.txt
 	-rm Nummern-*.txt
-	time ./xnum1.pl --sep --notest --digits=4  --trace	
+	time ./BuchstabierenZahlen.pl --sep --notest --digits=3
+	
+test : 
+	bak.pl Nummern-*.txt
+	-rm Nummern-*.txt
+	time ./BuchstabierenZahlen.pl --sep --test --digits=9
+	
+x : 
+	clear
+	bak.pl Nummern-*.txt
+	-rm Nummern-*.txt 2>/dev/null
+	time ./xnum1.pl --sep --test --digits=4  --trace	
 
 	
