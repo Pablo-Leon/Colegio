@@ -214,7 +214,7 @@ if ($optctl->{'test'}) {
 } else {
 
 
-for (my $nSet=1; $nSet < $nSets; $nSet+=1) 
+for (my $nSet=1; $nSet <= $nSets; $nSet+=1) 
 {
 	my @aNumbers=();
 	my $rToWrite={};
