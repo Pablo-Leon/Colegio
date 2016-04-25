@@ -44,8 +44,6 @@ test :
 	
 x : 
 	clear
-	bak.pl Nummern-*.txt
-	-rm Nummern-*.txt 2>/dev/null
-	time ./xnum1.pl --sep --test --digits=4  --trace	
+	time ./xnum1.pl --trace	
 
 	
